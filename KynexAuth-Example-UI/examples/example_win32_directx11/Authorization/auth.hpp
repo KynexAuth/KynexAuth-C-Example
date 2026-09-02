@@ -4,9 +4,9 @@
 
 #pragma comment(lib, "winhttp.lib")
 #ifdef _WIN64
-    #pragma comment(lib, "library_x64.lib")
+#pragma comment(lib, "library_x64.lib")
 #else
-    #pragma comment(lib, "library_x86.lib")
+#pragma comment(lib, "library_x86.lib")
 #endif
 
 #include "json.hpp"
@@ -24,21 +24,21 @@ struct channel_struct
 };
 
 namespace KynexAuth {
-    struct AppName { std::string value; };
-    struct OwnerID { std::string value; };
-    struct Version { std::string value; };
-    struct AppUrl { std::string value; };
+	struct AppName { std::string value; };
+	struct OwnerID { std::string value; };
+	struct Version { std::string value; };
+	struct AppUrl { std::string value; };
 
 	class api {
 	public:
 
-		std::string name, ownerid, version, url; 
+		std::string name, ownerid, version, url;
 		static bool debug;
 
-		api(AppName n, OwnerID o, Version v, AppUrl u, bool debugParameter = false) 
-		: name(n.value), ownerid(o.value), version(v.value), url(u.value)
+		api(AppName n, OwnerID o, Version v, AppUrl u, bool debugParameter = false)
+			: name(n.value), ownerid(o.value), version(v.value), url(u.value)
 		{
-		    setDebug(debugParameter);
+			setDebug(debugParameter);
 		}
 
 		void ban(std::string reason = "");
@@ -191,7 +191,7 @@ namespace KynexAuth {
 		std::atomic<uint64_t> auth_nonce_{ 0 };
 		std::atomic<long long> auth_window_{ 0 };
 		std::atomic<uint64_t> auth_seal_{ 0 };
-		
+
 
 		void load_user_data(nlohmann::json data) {
 			const std::string key_username = XorStr("username");
