@@ -118,19 +118,7 @@ int main()
     std::cout << skCrypt("\n\n Connecting..");
 
     KynexAuthApp.init();
-    if (!KynexAuthApp.response.success)
-    {
-        std::cout << skCrypt("\n Status: ") << KynexAuthApp.response.message;
-        
-        if (!KynexAuthApp.app_data.downloadLink.empty()) {
-            std::cout << skCrypt("\n\n Opening auto-update link in browser...");
-            Sleep(1500);
-            ShellExecuteA(NULL, "open", KynexAuthApp.app_data.downloadLink.c_str(), NULL, NULL, SW_SHOWNORMAL);
-        }
-        
-        init_fail_delay();
-        exit(1);
-    }
+   
 
     const std::string ownerid_copy = KynexAuthApp.ownerid; // preserve for auth check thread. -nigel
 
@@ -237,13 +225,7 @@ int main()
     run.detach(); // detach immediately to avoid terminate on early exits. -nigel
     check.detach(); // detach immediately to avoid terminate on early exits. -nigel
 
-    //enable 2FA 
-    // KynexAuthApp.enable2fa(); you will need to ask for the code
-    //enable 2fa without the need of asking for the code
-    //KynexAuthApp.enable2fa().handleInput(KynexAuthApp);
-
-    //disbale 2FA
-    // KynexAuthApp.disable2fa();
+  
 
     if (KynexAuthApp.user_data.username.empty())
         exit(10);
