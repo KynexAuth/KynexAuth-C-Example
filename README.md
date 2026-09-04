@@ -1,4 +1,4 @@
-# 🛡️ KynexAuth C++ SDK & Integration Guide
+# 🛡️ KynexAuth C++ SDK & Integration Guide Please Star ⭐
 
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-17%20%2F%2020-blue.svg)](https://isocpp.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20(x86%20%2F%20x64)-lightgrey.svg)](https://microsoft.com/windows)
