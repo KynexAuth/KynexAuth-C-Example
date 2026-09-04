@@ -4,13 +4,12 @@
 
 #pragma comment(lib, "winhttp.lib")
 #ifdef _WIN64
-#pragma comment(lib, "library_x64.lib")
+    #pragma comment(lib, "library_x64.lib")
 #else
-#pragma comment(lib, "library_x86.lib")
+    #pragma comment(lib, "library_x86.lib")
 #endif
 
 #include "json.hpp"
-#include "xorstr.hpp"
 #include <random>
 #include <chrono>
 #include <atomic>
@@ -24,21 +23,21 @@ struct channel_struct
 };
 
 namespace KynexAuth {
-	struct AppName { std::string value; };
-	struct OwnerID { std::string value; };
-	struct Version { std::string value; };
-	struct AppUrl { std::string value; };
+    struct AppName { std::string value; };
+    struct OwnerID { std::string value; };
+    struct Version { std::string value; };
+    struct AppUrl { std::string value; };
 
 	class api {
 	public:
 
-		std::string name, ownerid, version, url;
+		std::string name, ownerid, version, url; 
 		static bool debug;
 
-		api(AppName n, OwnerID o, Version v, AppUrl u, bool debugParameter = false)
-			: name(n.value), ownerid(o.value), version(v.value), url(u.value)
+		api(AppName n, OwnerID o, Version v, AppUrl u, bool debugParameter = false) 
+		: name(n.value), ownerid(o.value), version(v.value), url(u.value)
 		{
-			setDebug(debugParameter);
+		    setDebug(debugParameter);
 		}
 
 		void ban(std::string reason = "");
@@ -72,6 +71,10 @@ namespace KynexAuth {
 		bool block_proxy = false;
 		bool block_custom_ca = false;
 		bool block_private_dns = false;
+		bool enable_anti_debug = true;
+		bool enable_anti_tamper = true;
+		bool enable_proxy_check = true;
+		bool enable_hosts_check = true;
 		static std::string expiry_remaining(const std::string& expiry);
 		static constexpr const char* kSavePath = "test.json";
 		static constexpr int kInitFailSleepMs = 1500;
@@ -191,82 +194,12 @@ namespace KynexAuth {
 		std::atomic<uint64_t> auth_nonce_{ 0 };
 		std::atomic<long long> auth_window_{ 0 };
 		std::atomic<uint64_t> auth_seal_{ 0 };
+		
 
-
-		void load_user_data(nlohmann::json data) {
-			const std::string key_username = XorStr("username");
-			const std::string key_ip = XorStr("ip");
-			const std::string key_hwid = XorStr("hwid");
-			const std::string key_created = XorStr("createdate");
-			const std::string key_lastlogin = XorStr("lastlogin");
-			const std::string key_subs = XorStr("subscriptions");
-			const std::string key_sub_name = XorStr("subscription");
-			const std::string key_sub_expiry = XorStr("expiry");
-			api::user_data.username = data.value(key_username, "");
-			api::user_data.ip = data.value(key_ip, "");
-			if (!data.contains(key_hwid) || data[key_hwid].is_null()) {
-				api::user_data.hwid = XorStr("none");
-			}
-			else {
-				api::user_data.hwid = data[key_hwid];
-			}
-			api::user_data.createdate = data.value(key_created, "");
-			api::user_data.lastlogin = data.value(key_lastlogin, "");
-
-			api::user_data.subscriptions.clear();
-			if (data.contains(key_subs) && data[key_subs].is_array()) {
-				for (const auto& sub : data[key_subs]) {
-					subscriptions_class subscriptions;
-					if (sub.contains(key_sub_name))
-						subscriptions.name = sub.value(key_sub_name, "");
-					if (sub.contains(key_sub_expiry))
-						subscriptions.expiry = sub.value(key_sub_expiry, "");
-					api::user_data.subscriptions.emplace_back(subscriptions);
-				}
-			}
-		}
-
-		void load_app_data(nlohmann::json data) {
-			api::app_data.numUsers = data[XorStr("numUsers")];
-			api::app_data.numOnlineUsers = data[XorStr("numOnlineUsers")];
-			api::app_data.numKeys = data[XorStr("numKeys")];
-			api::app_data.version = data[XorStr("version")];
-			api::app_data.customerPanelLink = data[XorStr("customerPanelLink")];
-		}
-
-		void load_response_data(nlohmann::json data) {
-			api::response.success = data[XorStr("success")];
-			api::response.message = data["message"];
-			api::response.isPaid = false;
-
-			if (data.contains(XorStr("role").c_str()) && data[XorStr("role")] != XorStr("tester").c_str() && data[XorStr("role")] != XorStr("not_checked").c_str()) {
-				api::response.isPaid = true;
-			}
-		}
-
-		void load_channel_data(nlohmann::json data) {
-			api::response.success = data[XorStr("success")]; // intentional. Possibly trick a reverse engineer into thinking this string is for login function
-			api::response.message = data["message"];
-			api::response.channeldata.clear(); //If you do not delete the data before pushing it, the data will be repeated. github.com/TTakaTit
-			if (!data.contains("messages") || !data["messages"].is_array()) {
-				return; // avoid invalid server payload crash. -nigel
-			}
-			const std::string key_author = XorStr("author");
-			const std::string key_timestamp = XorStr("timestamp");
-			for (const auto& sub : data["messages"]) {
-				if (!sub.is_object())
-					continue;
-				std::string authoroutput = sub.value(key_author, "");
-				std::string messageoutput = sub.value("message", "");
-				const int timestamp = sub.value(key_timestamp, 0);
-				std::string timestampoutput = std::to_string(timestamp);
-				authoroutput.erase(remove(authoroutput.begin(), authoroutput.end(), '"'), authoroutput.end());
-				messageoutput.erase(remove(messageoutput.begin(), messageoutput.end(), '"'), messageoutput.end());
-				timestampoutput.erase(remove(timestampoutput.begin(), timestampoutput.end(), '"'), timestampoutput.end());
-				channel_struct output = { authoroutput , messageoutput, timestampoutput };
-				api::response.channeldata.push_back(output);
-			}
-		}
+		void load_user_data(nlohmann::json data);
+		void load_app_data(nlohmann::json data);
+		void load_response_data(nlohmann::json data);
+		void load_channel_data(nlohmann::json data);
 
 		std::atomic<bool> ban_monitor_running_{ false };
 		std::atomic<bool> ban_monitor_detected_{ false };
